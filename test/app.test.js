@@ -1,0 +1,58 @@
+const request = require('supertest')
+const app = require('../app')
+const { calculateValue } = require('../lib/logic')
+
+describe('Suite de Pruebas de Calidad de Software', () => {
+  describe('Pruebas Unitarias - Lógica de Inventario', () => {
+    test('Debe calcular correctamente el valor total (10*5=50)', () => {
+      const result = calculateValue(10, 5)
+      expect(result).toBe(50)
+    })
+
+    test('Debe retornar 0 si se ingresan valores negativos', () => {
+      const result = calculateValue(-10, 5)
+      expect(result).toBe(0)
+    })
+
+    // DESAFÍO: 2 Validaciones Adicionales en Jest
+    test('EXTRA 1: Debe retornar 0 si el precio es 0', () => {
+      const result = calculateValue(0, 10)
+      expect(result).toBe(0)
+    })
+
+    test('EXTRA 2: Debe retornar 0 si el stock es negativo', () => {
+      const result = calculateValue(10, -5)
+      expect(result).toBe(0)
+    })
+  })
+
+  describe('Pruebas de Integración - API Endpoints', () => {
+    test('GET /health - Debe responder con status 200 y JSON correcto', async () => {
+      const response = await request(app).get('/health')
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toHaveProperty('status', 'OK')
+    })
+
+    test('GET /items - Debe validar la estructura del inventario', async () => {
+      const response = await request(app).get('/items')
+      expect(response.statusCode).toBe(200)
+      expect(Array.isArray(response.body)).toBe(true)
+      expect(response.body[0]).toHaveProperty('id')
+      expect(response.body[0]).toHaveProperty('stock')
+    })
+
+    // EXTRA 1
+    test('EXTRA 1: GET /items - El stock debe ser mayor o igual a 0', async () => {
+      const response = await request(app).get('/items')
+      expect(response.statusCode).toBe(200)
+      expect(response.body[0].stock).toBeGreaterThanOrEqual(0)
+    })
+
+    // EXTRA 2 
+    test('EXTRA 2: GET /items - La respuesta debe contener al menos un item', async () => {
+      const response = await request(app).get('/items')
+      expect(response.statusCode).toBe(200)
+      expect(response.body.length).toBeGreaterThan(0)
+    })
+  })
+})
