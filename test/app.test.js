@@ -41,7 +41,7 @@ describe('Suite de Pruebas de Calidad de Software', () => {
       expect(response.body[0]).toHaveProperty('stock')
     })
 
-    // EXTRA 1
+    // EXTRA 1 supertest
     test('EXTRA 1: GET /items - El stock debe ser mayor o igual a 0', async () => {
       const response = await request(app).get('/items')
       expect(response.statusCode).toBe(200)
